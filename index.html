@@ -105,52 +105,59 @@
 
 <script>
     // 👑 ĐÂY LÀ NƠI BẠN SỬA ĐIỂM SỐ TRỰC TIẾP TRÊN GITHUB ĐỂ CẢ NHÓM CÙNG THẤY 👑
-    let defaultPlayers = [
- { id: 1, name: "Người chơi 1", matches: 0, score: 0, seed: "Leo", bg: "b6e3f4" },
-        { id: 2, name: "Người chơi 2", matches: 0, score: 0, seed: "Felix", bg: "c0aade" },
-        { id: 3, name: "Người chơi 3", matches: 0, score: 0, seed: "Milo", bg: "d1f4c9" },
-        { id: 4, name: "Người chơi 4", matches: 0, score: 0, seed: "Bear", bg: "ffd5dc" },
-        { id: 5, name: "Người chơi 5", matches: 0, score: 0, seed: "Rocky", bg: "ffdfba" },
-        { id: 6, name: "Người chơi 6", matches: 0, score: 0, seed: "Bunny", bg: "e8eaed" },
-        { id: 7, name: "Người chơi 7", matches: 0, score: 0, seed: "Simba", bg: "bffffa" },
-        { id: 8, name: "Người chơi 8", matches: 0, score: 0, seed: "Tiger", bg: "fffaa0" },
-        { id: 9, name: "Người chơi 9", matches: 0, score: 0, seed: "Panda", bg: "caced1" },
-        { id: 10, name: "Người chơi 10", matches: 0, score: 0, seed: "Fox", bg: "ebd2be" },
-        { id: 11, name: "Người chơi 11", matches: 0, score: 0, seed: "Wolf", bg: "d5e4eb" },
-        { id: 12, name: "Người chơi 12", matches: 0, score: 0, seed: "Rabbit", bg: "f7d6e0" },
-        { id: 13, name: "Người chơi 13", matches: 0, score: 0, seed: "Koala", bg: "f2b5d4" },
-        { id: 14, name: "Người chơi 14", matches: 0, score: 0, seed: "Otter", bg: "bbf6ca" },
-        { id: 15, name: "Người chơi 15", matches: 0, score: 0, seed: "Lion", bg: "ffeaa7" },
-        { id: 16, name: "Người chơi 16", matches: 0, score: 0, seed: "Zebra", bg: "dfe6e9" },
-        { id: 17, name: "Người chơi 17", matches: 0, score: 0, seed: "Giraffe", bg: "fab1a0" },
-        { id: 18, name: "Người chơi 18", matches: 0, score: 0, seed: "Elephant", bg: "74b9ff" },
-        { id: 19, name: "Người chơi 19", matches: 0, score: 0, seed: "Monkey", bg: "ffeaa7" },
-        { id: 20, name: "Người chơi 20", matches: 0, score: 0, seed: "Cheetah", bg: "fdcb6e" },
-        { id: 21, name: "Người chơi 21", matches: 0, score: 0, seed: "Panther", bg: "a29bfe" },
-        { id: 22, name: "Người chơi 22", matches: 0, score: 0, seed: "Teddy", bg: "e17055" },
-        { id: 23, name: "Người chơi 23", matches: 0, score: 0, seed: "Spark", bg: "00cec9" },
-        { id: 24, name: "Người chơi 24", matches: 0, score: 0, seed: "Pixel", bg: "00b894" },
-        { id: 25, name: "Người chơi 25", matches: 0, score: 0, seed: "Nova", bg: "e84393" },
-        { id: 26, name: "Người chơi 26", matches: 0, score: 0, seed: "Shadow", bg: "6c5ce7" },
-        { id: 27, name: "Người chơi 27", matches: 0, score: 0, seed: "Ghost", bg: "b2bec3" },
-        { id: 28, name: "Người chơi 28", matches: 0, score: 0, seed: "Matrix", bg: "ffe3e2" },
-        { id: 29, name: "Người chơi 29", matches: 0, score: 0, seed: "Alpha", bg: "fbc531" },
-        { id: 30, name: "Người chơi 30", matches: 0, score: 0, seed: "Beta", bg: "4cd137" },
-        { id: 31, name: "Người chơi 31", matches: 0, score: 0, seed: "Gamma", bg: "487eb0" },
-        { id: 32, name: "Người chơi 32", matches: 0, score: 0, seed: "Delta", bg: "e84118" },
-        { id: 33, name: "Người chơi 33", matches: 0, score: 0, seed: "Zeta", bg: "9c88ff" },
-        { id: 34, name: "Người chơi 34", matches: 0, score: 0, seed: "Omega", bg: "f5f6fa" },
-        { id: 35, name: "Người chơi 35", matches: 0, score: 0, seed: "Apollo", bg: "7f8fa6" },
-        { id: 36, name: "Người chơi 36", matches: 0, score: 0, seed: "Thor", bg: "eed2ee" },
-        { id: 37, name: "Người chơi 37", matches: 0, score: 0, seed: "Loki", bg: "d1eeee" },
-        { id: 38, name: "Người chơi 38", matches: 0, score: 0, seed: "Odin", bg: "e0eee0" },
-        { id: 39, name: "Người chơi 39", matches: 0, score: 0, seed: "Zeus", bg: "ffebd7" },
-        { id: 40, name: "Người chơi 40", matches: 0, score: 0, seed: "Hades", bg: "f0fff0" },
-        { id: 41, name: "Người chơi 41", matches: 0, score: 0, seed: "Ares", bg: "fff0f5" },
-        { id: 42, name: "Người chơi 42", matches: 0, score: 0, seed: "Titan", bg: "f0ffff" }
-    ];
+ // Biến lưu trữ dữ liệu người chơi
+    let players = [];
+    let currentSearchKeyword = "";
 
-    let players = [...defaultPlayers];
+    // 🔗 Dán đường link .csv của bạn vào giữa 2 dấu nháy kép dưới đây:
+    const GOOGLE_SHEET_CSV_URL = "DÁN_LINK_BẠN_VỪA_COPY_VÀO_ĐÂY";
+
+    // Hàm gọi dữ liệu từ Google Sheets
+    async function fetchPlayersData() {
+        try {
+            const response = await fetch(GOOGLE_SHEET_CSV_URL);
+            const csvText = await response.text();
+            players = parseCSV(csvText);
+            renderLeaderboard();
+        } catch (error) {
+            console.error("Lỗi khi tải dữ liệu từ Google Sheets:", error);
+            // Có thể thêm một thông báo lỗi trên UI tại đây nếu muốn
+        }
+    }
+
+    // Hàm dịch dữ liệu CSV thành mảng Object giống với cấu trúc ban đầu của bạn
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n');
+        const result = [];
+        
+        // Bắt đầu từ vòng lặp 1 để bỏ qua hàng tiêu đề (id, name, matches...)
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue; // Bỏ qua các dòng trống
+
+            const cols = line.split(',');
+            // Đảm bảo có đủ 6 cột dữ liệu mới đưa vào mảng
+            if (cols.length >= 6) {
+                result.push({
+                    id: parseInt(cols[0]),
+                    name: cols[1].replace(/"/g, '').trim(), // Xóa dấu nháy kép nếu có
+                    matches: parseInt(cols[2]) || 0,
+                    score: parseInt(cols[3]) || 0,
+                    seed: cols[4].trim(),
+                    bg: cols[5].trim()
+                });
+            }
+        }
+        return result;
+    }
+
+    function initData() {
+        // Thay vì gọi render ngay, ta gọi hàm fetch dữ liệu trước
+        fetchPlayersData();
+        
+        // Tự động làm mới dữ liệu mỗi 5 phút (300000 ms) để cập nhật bảng xếp hạng
+        setInterval(fetchPlayersData, 300000);
+    }
     let currentSearchKeyword = "";
 
     function initData() {
