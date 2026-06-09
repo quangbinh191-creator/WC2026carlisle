@@ -104,15 +104,13 @@
     </div>
 
 <script>
-    // 👑 ĐÂY LÀ NƠI BẠN SỬA ĐIỂM SỐ TRỰC TIẾP TRÊN GITHUB ĐỂ CẢ NHÓM CÙNG THẤY 👑
- // Biến lưu trữ dữ liệu người chơi
     let players = [];
     let currentSearchKeyword = "";
 
-    // 🔗 Dán đường link .csv của bạn vào giữa 2 dấu nháy kép dưới đây:
+    // 🔗 Đường dẫn CSV kết nối trực tiếp đến Google Sheet của bạn
     const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOu74BZum8hv_WCNc2lCqbSmV-YXWkwWTrQZ4LmAZgY8Tjj6d9DEA1h6P9E8_4qXWisZy9-atqMeUP/pub?gid=0&single=true&output=csv";
 
-    // Hàm gọi dữ liệu từ Google Sheets
+    // Hàm kết nối và lấy dữ liệu ngầm từ Google Sheets
     async function fetchPlayersData() {
         try {
             const response = await fetch(GOOGLE_SHEET_CSV_URL);
@@ -121,30 +119,31 @@
             renderLeaderboard();
         } catch (error) {
             console.error("Lỗi khi tải dữ liệu từ Google Sheets:", error);
-            // Có thể thêm một thông báo lỗi trên UI tại đây nếu muốn
+            document.getElementById('rankingList').innerHTML = `<div class="text-center py-10 text-red-400 italic">Đang gặp lỗi kết nối với Google Sheets công khai. Vui lòng kiểm tra lại cấu hình chia sẻ!</div>`;
         }
     }
 
-    // Hàm dịch dữ liệu CSV thành mảng Object giống với cấu trúc ban đầu của bạn
+    // Hàm dịch chuỗi dữ liệu CSV thành mảng Đối tượng (Hỗ trợ cả phân tách dấu , và dấu ;)
     function parseCSV(csvText) {
         const lines = csvText.split('\n');
         const result = [];
         
-        // Bắt đầu từ vòng lặp 1 để bỏ qua hàng tiêu đề (id, name, matches...)
+        // Vòng lặp chạy từ dòng 1 để bỏ qua dòng tiêu đề gốc (id, name, matches...)
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
-            if (!line) continue; // Bỏ qua các dòng trống
+            if (!line) continue;
 
-            const cols = line.split(',');
-            // Đảm bảo có đủ 6 cột dữ liệu mới đưa vào mảng
+            // Sử dụng biểu thức chính quy Regex để tách hàng bằng dấu phẩy hoặc chấm phẩy
+            const cols = line.split(/[,;]/);
+            
             if (cols.length >= 6) {
                 result.push({
                     id: parseInt(cols[0]),
-                    name: cols[1].replace(/"/g, '').trim(), // Xóa dấu nháy kép nếu có
+                    name: cols[1].replace(/"/g, '').trim(),
                     matches: parseInt(cols[2]) || 0,
                     score: parseInt(cols[3]) || 0,
-                    seed: cols[4].trim(),
-                    bg: cols[5].trim()
+                    seed: cols[4].replace(/"/g, '').trim(),
+                    bg: cols[5].replace(/"/g, '').trim()
                 });
             }
         }
@@ -152,22 +151,23 @@
     }
 
     function initData() {
-        // Thay vì gọi render ngay, ta gọi hàm fetch dữ liệu trước
+        // Tải dữ liệu lần đầu tiên khi vừa truy cập trang web
         fetchPlayersData();
         
-        // Tự động làm mới dữ liệu mỗi 5 phút (300000 ms) để cập nhật bảng xếp hạng
+        // Tự động quét lại dữ liệu mới từ Google Sheets sau mỗi 5 phút (300000 ms)
         setInterval(fetchPlayersData, 300000);
-    }
-    let currentSearchKeyword = "";
-
-    function initData() {
-        renderLeaderboard();
     }
 
     function renderLeaderboard() {
-        players.sort((a, b) => b.score - a.score);
-        let rankedData = players.map((p, idx) => ({ ...p, actualRank: idx + 1 }));
+        // Sao chép mảng dữ liệu gốc để tránh thay đổi thứ tự ban đầu của Sheets
+        let sortedPlayers = [...players];
+        // Sắp xếp người chơi theo điểm số giảm dần (Ai điểm cao hơn đứng trước)
+        sortedPlayers.sort((a, b) => b.score - a.score);
+        
+        // Đánh số thứ hạng chính thức sau khi sắp xếp điểm số
+        let rankedData = sortedPlayers.map((p, idx) => ({ ...p, actualRank: idx + 1 }));
 
+        // Thực hiện lọc theo từ khóa nếu người dùng đang tìm kiếm tên cụ thể
         if (currentSearchKeyword !== "") {
             rankedData = rankedData.filter(p => p.name.toLowerCase().includes(currentSearchKeyword.toLowerCase()));
         }
@@ -179,6 +179,7 @@
         renderTableRows(individualList, rankedData.length === 0);
     }
 
+    // Hàm gọi API tạo avatar Chibi ngẫu nhiên dựa trên Seed và màu Nền trong Sheets
     function getChibiAvatarUrl(seed, bg) {
         return `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${seed}&backgroundColor=${bg}`;
     }
@@ -187,16 +188,20 @@
         const podiumContainer = document.getElementById('podiumContainer');
         podiumContainer.innerHTML = '';
 
+        if(top3Data.length === 0) return;
+
         let displayOrder = [];
         const rank1 = top3Data.find(p => p.actualRank === 1);
         const rank2 = top3Data.find(p => p.actualRank === 2);
         const rank3 = top3Data.find(p => p.actualRank === 3);
 
+        // Định hình lại thứ tự hiển thị trên PC: Hạng 2 bên trái - Hạng 1 ở giữa - Hạng 3 bên phải
         if (window.innerWidth >= 768) {
             if (rank2) displayOrder.push(rank2);
             if (rank1) displayOrder.push(rank1);
             if (rank3) displayOrder.push(rank3);
         } else {
+            // Trên điện thoại thì xếp dọc từ trên xuống dưới theo thứ tự hạng 1, 2, 3
             if (rank1) displayOrder.push(rank1);
             if (rank2) displayOrder.push(rank2);
             if (rank3) displayOrder.push(rank3);
@@ -275,7 +280,9 @@
         renderLeaderboard();
     }
 
+    // Kích hoạt toàn bộ hệ thống dữ liệu khi tải trang
     initData();
+    // Lắng nghe sự kiện đổi kích thước màn hình để tự động hoán đổi vị trí Top 3 (PC / Mobile)
     window.addEventListener('resize', renderLeaderboard);
 </script>
 </body>
