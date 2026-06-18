@@ -258,7 +258,7 @@
                 const bg = avatarColors[i % avatarColors.length];
 
                 calculatedPlayers.push({
-                    id: i,
+                    id: i, // ID chính là số thứ tự dòng trong Sheet (i nhỏ hơn nghĩa là nộp sớm hơn)
                     name: nickname,
                     matches: correctMatches,
                     totalMatches: totalAvailableMatches,
@@ -268,20 +268,23 @@
                     prevMatches: prevMatches,
                     seed: nickname,
                     bg: bg,
-                    prevRank: null // Sẽ được tính bên dưới
+                    prevRank: null
                 });
             }
 
-            // --- BƯỚC TÍNH TOÁN THỨ HẠNG CŨ DỰA TRÊN DÒNG 10 ---
+            // --- TÍNH TOÁN THỨ HẠNG CŨ DỰA TRÊN DÒNG 10 (ƯU TIÊN: ĐIỂM -> TRẬN -> ID DÒNG TĂNG DẦN) ---
             if (hasPrevData) {
                 let prevSorted = [...calculatedPlayers].sort((a, b) => {
                     if (b.prevScore !== a.prevScore) return b.prevScore - a.prevScore;
-                    return b.prevMatches - a.prevMatches;
+                    if (b.prevMatches !== a.prevMatches) return b.prevMatches - a.prevMatches;
+                    return a.id - b.id; // Hàng nhỏ hơn (nộp sớm hơn) đứng trước
                 });
+                
                 let prevRanksMap = {};
                 prevSorted.forEach((p, idx) => {
-                    prevRanksMap[p.name] = idx + 1;
+                    prevRanksMap[p.name] = idx + 1; // Vì ID dòng là duy nhất nên phân cấp hạng tuần tự tuyệt đối
                 });
+                
                 calculatedPlayers.forEach(p => {
                     p.prevRank = prevRanksMap[p.name] || null;
                 });
@@ -298,7 +301,7 @@
 
     function initData() {
         fetchPlayersData();
-        setInterval(fetchPlayersData, 300000); // 5 phút tự động load lại dữ liệu một lần
+        setInterval(fetchPlayersData, 300000); // 5 phút tự động tải lại dữ liệu một lần
     }
 
     function getRankChangeHTML(change) {
@@ -313,18 +316,19 @@
     function renderLeaderboard() {
         let sortedPlayers = [...players];
         
-        // SẮP XẾP HIỆN TẠI: ƯU TIÊN ĐIỂM MỚI (SCORE), SAU ĐÓ XÉT TRẬN THẮNG MỚI (MATCHES)
+        // SẮP XẾP HIỆN TẠI: ƯU TIÊN ĐIỂM MỚI -> TRẬN THẮNG MỚI -> ID DÒNG NHỎ NHẤT (NỘP TRƯỚC)
         sortedPlayers.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
-            return b.matches - a.matches;
+            if (b.matches !== a.matches) return b.matches - a.matches;
+            return a.id - b.id; // Ai nộp trước (dòng nằm trên trong Sheet) xếp hạng cao hơn
         });
         
-        // Tính toán thứ hạng hiện tại và mức độ tăng giảm so với dòng 10
+        // Tính toán thứ hạng hiện tại và mức độ tăng giảm bậc chính xác
         let rankedData = sortedPlayers.map((p, idx) => {
             const currentRank = idx + 1;
             let rankChange = 0;
             if (p.prevRank !== null) {
-                rankChange = p.prevRank - currentRank; // Rank cũ số to hơn rank mới => Tăng hạng (Dương)
+                rankChange = p.prevRank - currentRank;
             }
             return { ...p, actualRank: currentRank, rankChange: rankChange };
         });
