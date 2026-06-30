@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght=500;700&family=Plus+Jakarta+Sans:wght=400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
@@ -310,7 +310,7 @@
             }
 
             // ==========================================
-            // II. XỬ LÝ VÒNG KNOCKOUT (LƯỢT 2)
+            // II. XỬ LÝ VÒNG KNOCKOUT (LƯỢT 2) - ĐÃ SỬA LỖI
             // ==========================================
             if (r2Rows && r2Rows.length >= 3) {
                 const r2Headers = r2Rows[0];
@@ -391,21 +391,21 @@
     }
 
     function buildRankData(playersArray) {
-        // 1. Tìm Rank Cũ (Dựa độc lập trên dữ liệu cũ)
+        // 1. Tìm Rank Cũ (Dựa trên dữ liệu cũ)
         let prevSorted = [...playersArray].sort((a, b) => {
             if (b.prevScore !== a.prevScore) return b.prevScore - a.prevScore;
             if (b.prevMatches !== a.prevMatches) return b.prevMatches - a.prevMatches;
             return a.id - b.id;
         });
         
-        // 2. Tìm Rank Mới (Dựa độc lập trên dữ liệu mới)
+        // 2. Tìm Rank Mới (Dựa trên dữ liệu mới)
         let nextSorted = [...playersArray].sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
             if (b.matches !== a.matches) return b.matches - a.matches;
             return a.id - b.id;
         });
 
-        // Ánh xạ thứ hạng ngược lại vào mảng chính xác để không bị ghi đè chéo
+        // Ánh xạ thứ hạng
         playersArray.forEach(p => {
             p.prevRank = prevSorted.findIndex(o => o.name === p.name) + 1;
             p.actualRank = nextSorted.findIndex(o => o.name === p.name) + 1;
@@ -426,7 +426,7 @@
             }
         });
 
-        const hasPrevData = activePlayers.some(p => p.prevScore > 0 || p.prevMatches > 0);
+        const hasPrevData = activePlayers.some(p => p.prevScore !== 0 || p.prevMatches > 0);
 
         if (hasPrevData && ((maxLeapPlayer && maxLeapValue > 0) || (maxFallPlayer && maxFallValue > 0))) {
             showSpecialEventsBanner(maxLeapPlayer, maxLeapValue, maxFallPlayer, maxFallValue);
